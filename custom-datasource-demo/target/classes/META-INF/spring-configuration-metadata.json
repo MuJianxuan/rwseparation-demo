@@ -1,0 +1,18 @@
+{
+  "groups": [
+    {
+      "name": "spring.datasource.master",
+      "type": "javax.sql.DataSource",
+      "sourceType": "org.rw.custom.config.CustomDataSourceConfig",
+      "sourceMethod": "master()"
+    },
+    {
+      "name": "spring.datasource.slave",
+      "type": "javax.sql.DataSource",
+      "sourceType": "org.rw.custom.config.CustomDataSourceConfig",
+      "sourceMethod": "slaver()"
+    }
+  ],
+  "properties": [],
+  "hints": []
+}

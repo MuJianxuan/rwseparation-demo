@@ -1,0 +1,5 @@
+org\rw\sharding\jdbc\controller\ShardingUserController.class
+org\rw\sharding\jdbc\service\UserService.class
+org\rw\sharding\jdbc\controller\UserController.class
+org\rw\sharding\jdbc\service\impl\UserServiceImpl.class
+org\rw\sharding\jdbc\ShardingJdbcApplication.class

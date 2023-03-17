@@ -1,0 +1,3 @@
+org\rw\common\config\GlobalMetaObjectHandler.class
+org\rw\common\config\GlobalMybatisConfig.class
+org\rw\common\config\SwaggerConfig.class

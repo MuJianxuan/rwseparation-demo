@@ -1,0 +1,14 @@
+org\rw\custom\core\DS.class
+org\rw\custom\core\DataSourceMethodInterceptor.class
+org\rw\custom\ds\RouteHolder.class
+org\rw\custom\service\impl\UserServiceImpl.class
+org\rw\custom\ds\AbstractRoutingDataSource.class
+META-INF\spring-configuration-metadata.json
+org\rw\custom\config\CustomDataSourceConfig.class
+org\rw\custom\ds\DsRouteHolder.class
+org\rw\custom\CustomDatasourceApplication.class
+org\rw\custom\ds\DataSourceEnum.class
+org\rw\custom\ds\DsRouteHolder$1.class
+org\rw\custom\service\UserService.class
+org\rw\custom\ds\DataSourceRouter.class
+org\rw\custom\controller\UserController.class

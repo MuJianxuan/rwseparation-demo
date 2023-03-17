@@ -1,0 +1,5 @@
+org\rw\dynamic\config\DynamicDataSourceConfig.class
+org\rw\dynamic\RwDynamicApplication.class
+org\rw\dynamic\service\impl\UserServiceImpl.class
+org\rw\dynamic\controller\UserController.class
+org\rw\dynamic\service\UserService.class

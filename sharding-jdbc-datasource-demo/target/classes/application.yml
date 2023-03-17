@@ -1,0 +1,145 @@
+server:
+  port: 8088
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  servlet:
+    multipart:
+      enabled: true
+      #单文件大小
+      max-file-size: 5MB
+      #总上传数据大小
+      max-request-size: 10MB
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss.SSS
+    time-zone: GMT+8
+    defaultPropertyInclusion: non_null   #非空属性才序列化
+    deserialization:
+      FAIL_ON_UNKNOWN_PROPERTIES: false #未定义的key不序列化
+  shardingsphere:
+    datasource:
+
+      names: slave0,slave1,slave0slave,slave1slave
+      # 主库
+      master:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: jdbc:mysql://127.0.0.1:3306/user?autoReconnect=true&serverTimezone=Asia/Shanghai
+#        url: jdbc:mysql://127.0.0.1:3306/user?autoReconnect=true&serverTimezone=Asia/Shanghai
+        username: 'root'
+        password: '123456'
+        type: com.zaxxer.hikari.HikariDataSource
+
+      # 从库  (分库分表做主库)
+      slave0:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: jdbc:mysql://127.0.0.1:3306/user1?autoReconnect=true&serverTimezone=Asia/Shanghai
+#        url: jdbc:mysql://127.0.0.1:3306/user1?autoReconnect=true&serverTimezone=Asia/Shanghai
+        username: 'root'
+        password: '123456'
+        type: com.zaxxer.hikari.HikariDataSource
+      slave1:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: jdbc:mysql://127.0.0.1:3306/user2?autoReconnect=true&serverTimezone=Asia/Shanghai
+        #        url: jdbc:mysql://127.0.0.1:3306/user1?autoReconnect=true&serverTimezone=Asia/Shanghai
+        username: 'root'
+        password: '123456'
+        type: com.zaxxer.hikari.HikariDataSource
+      # slave0 的从库
+      slave0slave:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: jdbc:mysql://127.0.0.1:3306/user1slave?autoReconnect=true&serverTimezone=Asia/Shanghai
+        #        url: jdbc:mysql://127.0.0.1:3306/user1?autoReconnect=true&serverTimezone=Asia/Shanghai
+        username: 'root'
+        password: '123456'
+        type: com.zaxxer.hikari.HikariDataSource
+      # slave1 的从库
+      slave1slave:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: jdbc:mysql://127.0.0.1:3306/user2slave?autoReconnect=true&serverTimezone=Asia/Shanghai
+        #        url: jdbc:mysql://127.0.0.1:3306/user1?autoReconnect=true&serverTimezone=Asia/Shanghai
+        username: 'root'
+        password: '123456'
+        type: com.zaxxer.hikari.HikariDataSource
+
+
+    # Sharding-Jdbc实现读写分离 主从配置  （那么如何在 分库分表的基础上做 读写分离呢？） 在此基础肯定行不通
+#    masterslave:
+#      # 主的
+#      master-data-source-name: master
+#      # 从的
+#      slave-data-source-names: slave0,slave1
+#      # 负载均衡算法
+#      load-balance-algorithm-type: round_robin
+#      # 配置主从名称
+#      name: ms
+
+    # 打印Sql
+    props:
+      sql:
+        show: true
+    # 分片配置
+    sharding:
+      # 默认数据源 主要用于写
+#      default-data-source-name: master
+      # 表分片
+      # 默认的数据源分片策略
+#      default-database-strategy:
+#        inline:
+#          sharding-column: sex
+#          # 分片算法
+#          algorithm-expression: slave$->{sex%2}
+
+      tables:
+        # 定义
+        t_user:
+          # 说明： 数据源指的是上面datasource 配置的名称
+          # 多数据源 相同表：数据源$->{0..N}.逻辑表名${0..N}
+          # 多数据源 不同表：数据源.逻辑表名$->{0..N},数据源.逻辑表名$->{0..N},...
+          # 单库分表  : 数据源.逻辑表名$->{0..N}
+          # 全部手动指定：数据源.逻辑表名,数据源.逻辑表名,....
+          # 命名很重要， 由于我 master 和slave 用于测试读写分离，所以我这里就这样写，分库分表应该都用于写的 ，因此不会用到 slave ,wang
+          actual-data-nodes: slave$->{0..1}.t_user$->{0..1}
+          # 数据源分片策略 （需要注意的是 单词打错了会造成 解析不到策略，解析不到策略，就不会生效）
+          database-strategy:
+            inline:
+              sharding-column: sex
+              # 分片算法
+              algorithm-expression: slave$->{sex%2}
+          # 表分片策略
+          table-strategy:
+            inline:
+              sharding-column: age
+              algorithm-expression: t_user$->{age%2}
+          key-generator:
+            column: id
+            # 默认使用的是 雪花算法
+            type: SNOWFLAKE
+      # 分库分表下的读写分离
+#      master-slave-rules:
+#        slave0:
+#          master-data-source-name: slave0
+#          slave-data-source-names: slave0slave
+#        slave1:
+#          master-data-source-name: slave1
+#          slave-data-source-names: slave1slave
+
+mybatis-plus:
+  # Mapper.xml 文件位置 Maven 多模块项目的扫描路径需以 classpath*: 开头
+  mapperLocations: classpath*:mapper/*Mapper.xml
+  configuration: # MyBatis 原生支持的配置
+    # 是否开启自动驼峰命名规则（camel case）映射
+    mapUnderscoreToCamelCase: true
+    #缓存开启
+    cache-enabled: true
+  global-config: # 全局策略配置
+    # 是否控制台 print mybatis-plus 的 LOGO
+    banner: false
+    db-config:
+      # id类型
+      id-type: auto
+      # 表名是否使用下划线命名，默认数据库表使用下划线命名
+      table-underline: true
+#      logic-delete-field: deleted  # 全局逻辑删除的实体字段名(since 3.3.0,配置后可以忽略不配置步骤2)
+#      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+#      logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
+
